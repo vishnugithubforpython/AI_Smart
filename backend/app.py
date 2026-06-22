@@ -4,6 +4,7 @@ from rag.embedder import create_embeddings
 from rag.vectorstore import create_vectorstore
 from rag.retriever import retrieve
 from rag.qa import generate_answer
+import faiss
 
 import glob
 
@@ -30,6 +31,18 @@ embeddings = create_embeddings(chunks)
 
 # Create vector store
 index = create_vectorstore(embeddings)
+
+
+#saving faiss 
+faiss.write_index(index, "resume_index.faiss")
+
+print("FAISS index saved!")
+
+#saving chunk of the pdf
+import pickle
+with open("chunks.pkl","wb")as f:
+    pickle.dump(chunks,f)
+print("chunks saved")
 
 # Ask question
 query = "What Program language vishnu knows?"
