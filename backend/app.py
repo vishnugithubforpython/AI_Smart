@@ -8,6 +8,8 @@ import faiss
 
 import glob
 
+chat_history=[]
+
 # Automatically find the PDF inside sample_data
 pdf_files = glob.glob("../sample_data/*.pdf")
 
@@ -44,23 +46,37 @@ with open("chunks.pkl","wb")as f:
     pickle.dump(chunks,f)
 print("chunks saved")
 
-# Ask question
-query = "What Program language vishnu knows?"
 
-# Retrieve relevant chunks
-results = retrieve(
-    query,
-    index,
-    chunks
-)
+while True:
 
-# Generate answer using Gemini
-context = "\n".join(results)
+    query = input("\nYou: ")
 
-answer = generate_answer(
-    query,
-    context
-)
+    if query.lower() == "exit":
+        print("Goodbye!")
+        break
 
-print("\nAnswer:")
-print(answer)
+    # Retrieve relevant chunks
+    results = retrieve(
+        query,
+        index,
+        chunks
+    )
+
+    # Create context
+    context = "\n".join(results)
+
+    # Generate answer
+    answer = generate_answer(
+        query,
+        context,
+        chat_history
+    )
+
+    print("\nAssistant:")
+    print(answer)
+
+    # Save conversation
+    chat_history.append({
+        "user": query,
+        "assistant": answer
+    })

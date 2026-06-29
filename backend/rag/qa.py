@@ -8,20 +8,34 @@ client = genai.Client(
     api_key=os.getenv("GOOGLE_API_KEY")
 )
 
-def generate_answer(query, context):
+def generate_answer(query, context, history):
+
+    history_text = ""
+
+    for chat in history:
+        history_text += f"""
+User: {chat['user']}
+Assistant: {chat['assistant']}
+"""
 
     prompt = f"""
-    Answer the question using ONLY the context below.
+You are a helpful AI assistant.
 
-    If the answer is not found in the context,
-    say "I could not find the answer in the provided document."
+Use the conversation history and the document context to answer.
 
-    Context:
-    {context}
+If the answer is not found in the context,
+say:
+"I could not find the answer in the provided document."
 
-    Question:
-    {query}
-    """
+Conversation History:
+{history_text}
+
+Document Context:
+{context}
+
+Current Question:
+{query}
+"""
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
