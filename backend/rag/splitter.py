@@ -14,3 +14,6 @@ def split_text(text):
     chunks = splitter.split_text(text)
 
     return chunks
+
+    
+
