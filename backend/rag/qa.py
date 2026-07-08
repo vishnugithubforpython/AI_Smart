@@ -1,14 +1,12 @@
 import os
 from dotenv import load_dotenv
 from google import genai
+from gemini_client import client
 
 load_dotenv()
 
-client = genai.Client(
-    api_key=os.getenv("GOOGLE_API_KEY")
-)
 
-def generate_answer(query, context, history):
+def rag_answer(query, context, history):
 
     history_text = ""
 
@@ -33,7 +31,7 @@ Conversation History:
 Document Context:
 {context}
 
-Current Question:
+Current Question:l
 {query}
 """
 
@@ -43,3 +41,7 @@ Current Question:
     )
 
     return response.text
+
+
+
+

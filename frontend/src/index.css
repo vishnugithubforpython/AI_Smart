@@ -1,0 +1,71 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --sidebar-bg: #f9f9f9;
+  --main-bg: #ffffff;
+  --text-primary: #0d0d0d;
+  --text-secondary: #6e6e80;
+  --text-muted: #8e8ea0;
+  --border-color: #e5e5e5;
+  --hover-bg: #ececec;
+  --active-bg: #ececec;
+  --user-msg-bg: #f4f4f4;
+  --code-bg: #f4f4f4;
+  --input-border: #d9d9e3;
+  --sidebar-width: 260px;
+  --header-height: 52px;
+  --input-area-height: 120px;
+
+  font-family: 'Söhne', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--main-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  width: 100%;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

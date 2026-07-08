@@ -1,0 +1,113 @@
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--main-bg);
+}
+
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+  background: var(--main-bg);
+}
+
+.chat-viewport {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.chat-viewport::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-viewport::-webkit-scrollbar-thumb {
+  background: #c5c5d2;
+  border-radius: 3px;
+}
+
+.messages-container {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 24px 24px 8px;
+  width: 100%;
+}
+
+.welcome-screen {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  width: 100%;
+}
+
+.welcome-screen h1 {
+  font-size: 28px;
+  font-weight: 500;
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+
+.welcome-screen p {
+  color: var(--text-secondary);
+  margin: 0 0 32px;
+}
+
+.suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.suggestion-card {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: var(--main-bg);
+}
+
+.suggestion-card:hover {
+  background: var(--hover-bg);
+}
+
+.suggestion-card span {
+  display: block;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.suggestion-card small {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.input-area {
+  padding: 12px 24px 24px;
+  background: var(--main-bg);
+}
+
+.input-area-inner {
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+.input-disclaimer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .suggestion-grid {
+    grid-template-columns: 1fr;
+  }
+}

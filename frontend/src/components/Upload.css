@@ -1,0 +1,15 @@
+.upload-btn {
+  padding: 8px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.upload-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
