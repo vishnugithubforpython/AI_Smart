@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from gemini_client import client
+from config import GEMINI_MODEL
 
 load_dotenv()
 
@@ -36,7 +37,7 @@ Current Question:l
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=GEMINI_MODEL,
         contents=prompt
     )
 

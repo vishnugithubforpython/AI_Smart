@@ -9,3 +9,4 @@ python-multipart
 numpy
 langchain
 pypdf
+pip install rank-bm25

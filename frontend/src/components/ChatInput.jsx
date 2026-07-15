@@ -1,15 +1,16 @@
 import { useRef, useState } from "react";
 import { Mic, ArrowUp } from "lucide-react";
-import { askQuestion } from "../services/api";
+import { askQuestion, uploadFile } from "../services/api";
 import Upload from "./Upload";
 import "./ChatInput.css";
 
 export default function ChatInput({ onUserMessage, onAssistantMessage, onError, disabled }) {
   const [value, setValue] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const textareaRef = useRef(null);
 
-  const isBusy = disabled || sending;
+  const isBusy = disabled || sending || uploading;
 
   const handleInput = () => {
     const textarea = textareaRef.current;
@@ -52,10 +53,38 @@ export default function ChatInput({ onUserMessage, onAssistantMessage, onError, 
     }
   };
 
+  const handleFileSelect = async (file) => {
+    if (isBusy) return;
+
+    onUserMessage(`Uploaded: ${file.name}`);
+    setUploading(true);
+
+    try {
+      const result = await uploadFile(file);
+      onAssistantMessage({
+        answer: result.message ?? `${file.name} uploaded successfully.`,
+        sources: [],
+        sourceType: "upload",
+      });
+    } catch (err) {
+      onAssistantMessage({
+        answer: err.message ?? "Upload failed. Please try again.",
+        sources: [],
+        sourceType: "error",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="chat-input">
       <div className="chat-input__wrapper">
-        <Upload />
+        <Upload
+          onFileSelect={handleFileSelect}
+          disabled={disabled || sending}
+          uploading={uploading}
+        />
         <textarea
           ref={textareaRef}
           className="chat-input__field"

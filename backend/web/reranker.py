@@ -6,7 +6,7 @@ reranker = CrossEncoder(
 )
 
 
-def rerank_web(query, documents, top_k=3):
+def rerank_web(query, documents, top_k=5):
 
     if not documents:
         return []

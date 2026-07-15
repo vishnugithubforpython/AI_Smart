@@ -8,24 +8,46 @@ from web_answer import web_answer
 
 def web_pipeline(query):
 
+    # -----------------------------
     # Step 1: Search Google
+    # -----------------------------
     search_results = search_web(query)
+
+    if not search_results:
+        return "I could not find relevant web results."
 
     documents = []
 
+    # -----------------------------
     # Step 2: Fetch & Extract
+    # -----------------------------
     for result in search_results:
 
         html = fetch_webpage(result["url"])
 
-        if html:
-            text = extract_text(html)
-        else:
-            text = ""
+        extracted_text = ""
 
-        # Step 3: Fallback to snippet
-        if not text:
-            text = result["snippet"]
+        if html:
+            extracted_text = extract_text(html)
+
+        snippet = result.get("snippet", "")
+
+        # -----------------------------
+        # Combine snippet + extracted text
+        # -----------------------------
+        if extracted_text:
+
+            text = f"""
+Snippet:
+{snippet}
+
+Content:
+{extracted_text}
+"""
+
+        else:
+
+            text = snippet
 
         documents.append({
             "title": result["title"],
@@ -33,21 +55,36 @@ def web_pipeline(query):
             "text": text
         })
 
-    # Step 4: Re-rank webpages
+    # -----------------------------
+    # Step 3: Re-rank webpages
+    # -----------------------------
     documents = rerank_web(
         query,
         documents
     )
 
-    # Step 5: Build context
-    context = build_context(
-        documents
-    )
+    # -----------------------------
+    # Step 4: Build context
+    # -----------------------------
+    context = build_context(documents)
 
-    # Step 6: Generate answer
+    # -----------------------------
+    # Step 5: Generate Answer
+    # -----------------------------
     answer = web_answer(
         query,
         context
     )
+
+    # -----------------------------
+    # Debug
+    # -----------------------------
+    print("\n========== WEB CONTEXT ==========")
+    print(context)
+    print("=================================\n")
+
+    print("\n========== WEB ANSWER ==========")
+    print(answer)
+    print("=================================\n")
 
     return answer

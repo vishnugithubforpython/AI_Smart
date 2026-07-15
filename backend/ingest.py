@@ -1,52 +1,102 @@
-from rag.loader import load_pdf
 from rag.splitter import split_text
 from rag.embedder import create_embeddings
-from rag.vectorstore import create_vectorstore
+from db.chunk_crud import save_chunks
+from rag.vectorstore import (
+    create_vectorstore,
+    load_index,
+    save_index,
+    load_metadata,
+    save_metadata,
+)
 
-import faiss
-import pickle
-import glob
+import numpy as np
 
-# Automatically find PDF
-pdf_files = glob.glob("../sample_data/*.pdf")
 
-if not pdf_files:
-    raise FileNotFoundError("No PDF found.")
+def ingest_document(document_id, text, source):
+    """
+    Incrementally ingest extracted text into the vector store.
 
-all_chunks = []
-text = []
+    Parameters
+    ----------
+    text : str
+        Extracted text from any document.
+    source : str
+        Original document path or filename.
+    """
 
-for pdf_path in pdf_files:
+    # -----------------------------
+    # Step 1 : Split into chunks
+    # -----------------------------
+    chunks = split_text(text)
 
-    pdf_text = load_pdf(pdf_path)
+    save_chunks(document_id, chunks)
 
-    chunks = split_text(pdf_text)
+    if not chunks:
+        print("No text found.")
+        return
+
+    # -----------------------------
+    # Step 2 : Prepare Metadata
+    # -----------------------------
+    texts = []
+    new_metadata = []
 
     for chunk in chunks:
 
-        text.append(chunk)
+        texts.append(chunk)
 
-        all_chunks.append({
-            "text": chunk,
-            "source": pdf_path
-        })
+        new_metadata.append(
+            {
+                "text": chunk,
+                "source": source
+            }
+        )
 
+    # -----------------------------
+    # Step 3 : Create Embeddings
+    # -----------------------------
+    embeddings = create_embeddings(texts)
 
+    embeddings = np.array(embeddings).astype("float32")
 
+    # -----------------------------
+    # Step 4 : Load Existing Index
+    # -----------------------------
+    index = load_index()
 
-print(f"Total Chunks: {len(all_chunks)}")
+    if index is None:
 
-# Create embeddings
-embeddings = create_embeddings(text)
+        print("No existing FAISS index found.")
+        print("Creating a new index...")
 
-# Create FAISS
-index = create_vectorstore(embeddings)
+        index = create_vectorstore(embeddings)
 
-# Save FAISS
-faiss.write_index(index, "resume_index.faiss")
+    else:
 
-# Save chunks
-with open("chunks.pkl", "wb") as f:
-    pickle.dump(all_chunks, f)
+        print("Existing FAISS index found.")
+        print("Adding new embeddings...")
 
-print("Ingestion Completed Successfully!")
+        index.add(embeddings)
+
+    # -----------------------------
+    # Step 5 : Save Index
+    # -----------------------------
+    save_index(index)
+
+    # -----------------------------
+    # Step 6 : Update Metadata
+    # -----------------------------
+    metadata = load_metadata()
+
+    metadata.extend(new_metadata)
+
+    save_metadata(metadata)
+
+    # -----------------------------
+    # Step 7 : Success Message
+    # -----------------------------
+    print("\n====================================")
+    print("Document Indexed Successfully")
+    print(f"Source        : {source}")
+    print(f"Chunks Added  : {len(chunks)}")
+    print("====================================")

@@ -127,7 +127,11 @@ export default function Message({
     <div className="message message--assistant">
       {sourceType && sourceType !== "error" && (
         <div className="message__source-badge">
-          {sourceType === "document" ? "From your documents" : "From web search"}
+          {sourceType === "document"
+            ? "From your documents"
+            : sourceType === "upload"
+              ? "Document uploaded"
+              : "From web search"}
         </div>
       )}
       <div className="message__content">{renderContent(content)}</div>

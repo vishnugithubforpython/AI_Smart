@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from upload import router as upload_router
 from models import QuestionRequest
 from router import process_query
 
@@ -16,6 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(upload_router)
+
 
 @app.get("/")
 def home():
@@ -29,6 +31,12 @@ def home():
 def ask(request: QuestionRequest):
 
     query = request.question
+
+
+    print("\n========== CHAT HISTORY ==========")
+    print(chat_history)
+    print("==================================\n")
+
 
     answer, sources = process_query(
         query,

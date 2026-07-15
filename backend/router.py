@@ -1,60 +1,118 @@
-from rag.retriever import retrieve
 from rag.qa import rag_answer
 from rag.reranker import rerank
+from query_rewriter.rewrite import rewrite_query
+from rag.vectorstore import load_index, load_metadata
+
+from hybrid_search.hybrid import hybrid_search
+
+from decision_engine.ai_router import decide_route
+from decision_engine.routes import DOCUMENT, WEB, GENERAL
+
 from web_pipeline import web_pipeline
 
-
-import faiss
-import pickle
-
 from config import RERANK_THRESHOLD
-
-# Load FAISS
-index = faiss.read_index("resume_index.faiss")
-
-# Load chunks
-with open("chunks.pkl", "rb") as f:
-    chunks = pickle.load(f)
 
 
 def process_query(query, chat_history):
 
-    # Step 1: Retrieve Top-K chunks using FAISS
-    results = retrieve(
+    # ==================================================
+    # Query Rewriter
+    # ==================================================
+
+    query = rewrite_query(
+        query,
+        chat_history
+    )
+
+    # ==================================================
+    # AI Router (FIRST)
+    # ==================================================
+
+    route = decide_route(query)
+
+    print("\n========== AI ROUTER ==========")
+    print(f"Selected Route : {route}")
+    print("===============================\n")
+
+    # ==================================================
+    # WEB PIPELINE
+    # ==================================================
+
+    if route == WEB:
+
+        print("\n========== WEB PIPELINE ==========\n")
+
+        answer = web_pipeline(query)
+
+        return answer, []
+
+    # ==================================================
+    # GENERAL PIPELINE
+    # ==================================================
+
+    if route == GENERAL:
+
+        print("\n========== GENERAL PIPELINE ==========\n")
+
+        answer = "GENERAL PIPELINE COMING SOON."
+
+        return answer, []
+
+    # ==================================================
+    # DOCUMENT PIPELINE
+    # ==================================================
+
+    print("\n========== DOCUMENT SEARCH ==========\n")
+
+    index = load_index()
+    chunks = load_metadata()
+
+    results = hybrid_search(
         query,
         index,
         chunks
     )
 
-    # Step 2: Re-rank the retrieved chunks
     results = rerank(
         query,
         results
     )
 
-    # Step 3: Print for debugging
     print("\n========== Retrieved & Re-ranked ==========")
 
     for i, chunk in enumerate(results, start=1):
+
+        faiss_score = (
+            f"{chunk['score']:.4f}"
+            if chunk["score"] is not None
+            else "N/A"
+        )
+
+        bm25_score = (
+            f"{chunk['bm25_score']:.4f}"
+            if chunk["bm25_score"] is not None
+            else "N/A"
+        )
+
         print(f"\nRank {i}")
         print(f"Source        : {chunk['source']}")
-        print(f"FAISS Distance: {chunk['score']:.4f}")
+        print(f"FAISS Score   : {faiss_score}")
+        print(f"BM25 Score    : {bm25_score}")
         print(f"Re-rank Score : {chunk['rerank_score']:.4f}")
 
     print("\n===========================================")
 
-    # Current routing (temporary)
-    best_distance = results[0]["score"]
     best_rerank = results[0]["rerank_score"]
 
-    print(f"\nBest FAISS Distance : {best_distance:.4f}")
-    print(f"Best Re-rank Score  : {best_rerank:.4f}")
+    print(f"\nBest Re-rank Score : {best_rerank:.4f}")
 
     if best_rerank > RERANK_THRESHOLD:
-        
+
+        print("\n========== DOCUMENT PIPELINE ==========\n")
 
         context = "\n".join(
-            [item["text"] for item in results]
+            item["text"]
+            for item in results
         )
 
         answer = rag_answer(
@@ -62,11 +120,11 @@ def process_query(query, chat_history):
             context,
             chat_history
         )
+
         return answer, results
-    
 
-    else:
+    print("\nNo relevant documents found.\n")
 
-        answer = web_pipeline(query)
+    answer = "I could not find relevant information in your uploaded documents."
 
-    return answer,[]
+    return answer, []

@@ -25,4 +25,25 @@ export async function askQuestion(question) {
   };
 }
 
+/**
+ * Upload a file to FastAPI POST /upload/
+ * React → api.js → FastAPI → { status, filename, file_type, message }
+ */
+export async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const { data } = await api.post("/upload/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  } catch (err) {
+    const detail = err.response?.data?.detail;
+    throw new Error(
+      typeof detail === "string" ? detail : "Upload failed. Please try again."
+    );
+  }
+}
+
 export default api;
