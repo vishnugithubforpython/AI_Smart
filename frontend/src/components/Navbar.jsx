@@ -1,7 +1,15 @@
-import { ChevronDown, Share2, Menu, Folder } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Menu } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 export default function Navbar({ onToggleSidebar }) {
+  const { user } = useAuth();
+
+  const initials = user?.username
+    ? user.username.slice(0, 2).toUpperCase()
+    : "AI";
+
   return (
     <header className="navbar">
       <div className="navbar__left">
@@ -13,19 +21,12 @@ export default function Navbar({ onToggleSidebar }) {
         >
           <Menu size={20} strokeWidth={1.75} />
         </button>
-        <button type="button" className="navbar__breadcrumb">
-          <Folder size={16} strokeWidth={1.75} />
-          <span>AI Smart</span>
-          <ChevronDown size={16} strokeWidth={1.75} />
-        </button>
+        <span className="navbar__title">AI Smart</span>
       </div>
       <div className="navbar__right">
-        <button type="button" className="navbar__icon-btn" aria-label="Share">
-          <Share2 size={18} strokeWidth={1.75} />
-        </button>
-        <button type="button" className="navbar__profile" aria-label="Profile">
-          <span>AI</span>
-        </button>
+        <Link to="/dashboard" className="navbar__profile" aria-label="Profile">
+          <span>{initials}</span>
+        </Link>
       </div>
     </header>
   );

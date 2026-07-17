@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Mic, ArrowUp } from "lucide-react";
-import { askQuestion, uploadFile } from "../services/api";
+import { askQuestion, uploadFile, extractErrorMessage } from "../services/api";
 import Upload from "./Upload";
 import "./ChatInput.css";
 
@@ -35,8 +35,8 @@ export default function ChatInput({ onUserMessage, onAssistantMessage, onError, 
     try {
       const { answer, sources, sourceType } = await askQuestion(text);
       onAssistantMessage({ answer, sources, sourceType });
-    } catch {
-      onError();
+    } catch (err) {
+      onError(err);
     } finally {
       setSending(false);
     }
@@ -56,7 +56,7 @@ export default function ChatInput({ onUserMessage, onAssistantMessage, onError, 
   const handleFileSelect = async (file) => {
     if (isBusy) return;
 
-    onUserMessage(`Uploaded: ${file.name}`);
+    onUserMessage(`Uploading: ${file.name}`);
     setUploading(true);
 
     try {
@@ -68,7 +68,7 @@ export default function ChatInput({ onUserMessage, onAssistantMessage, onError, 
       });
     } catch (err) {
       onAssistantMessage({
-        answer: err.message ?? "Upload failed. Please try again.",
+        answer: extractErrorMessage(err),
         sources: [],
         sourceType: "error",
       });

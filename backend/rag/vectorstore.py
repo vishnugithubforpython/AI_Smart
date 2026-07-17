@@ -19,8 +19,17 @@ def create_vectorstore(embeddings):
 
 
 def load_index():
+    print("\n******** load_index called ********")
+
+    print("cwd:", os.getcwd())
+    print("index path:", os.path.abspath(INDEX_PATH))
+    print("exists:", os.path.exists(INDEX_PATH))
+
     if os.path.exists(INDEX_PATH):
+        print("Reading existing index...")
         return faiss.read_index(INDEX_PATH)
+
+    print("Returning None...")
     return None
 
 

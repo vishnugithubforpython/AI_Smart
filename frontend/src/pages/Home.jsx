@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import Chatbox from "../components/Chatbox";
 import ChatInput from "../components/ChatInput";
-import { askQuestion } from "../services/api";
+import { askQuestion, extractErrorMessage } from "../services/api";
 
 let chatIdCounter = 1;
 let messageIdCounter = 1;
@@ -64,10 +64,6 @@ export default function Home() {
     const chat = createChat();
     setChats((prev) => [chat, ...prev]);
     setActiveChatId(chat.id);
-  };
-
-  const handleSelectChat = (chatId) => {
-    setActiveChatId(chatId);
     if (window.innerWidth <= 768) {
       setSidebarCollapsed(true);
     }
@@ -114,11 +110,11 @@ export default function Home() {
     [appendToChat]
   );
 
-  const handleError = useCallback(() => {
+  const handleError = useCallback((err) => {
     const chatId = activeChatIdRef.current;
     const errorMsg = createMessage(
       "assistant",
-      "Sorry, I couldn't reach the server. Make sure the backend is running on `http://127.0.0.1:8000`.",
+      err ? extractErrorMessage(err) : "Something went wrong. Please try again.",
       { sourceType: "error" }
     );
 
@@ -137,8 +133,8 @@ export default function Home() {
       .then(({ answer, sources, sourceType }) => {
         handleAssistantMessage({ answer, sources, sourceType });
       })
-      .catch(() => {
-        handleError();
+      .catch((err) => {
+        handleError(err);
       });
   };
 
@@ -159,27 +155,15 @@ export default function Home() {
     try {
       const { answer, sources, sourceType } = await askQuestion(userMsg.content);
       handleAssistantMessage({ answer, sources, sourceType });
-    } catch {
-      const errorMsg = createMessage(
-        "assistant",
-        "Sorry, I couldn't regenerate the response. Please try again.",
-        { sourceType: "error" }
-      );
-      appendToChat(chatId, (chat) => ({
-        ...chat,
-        messages: [...chat.messages, errorMsg],
-      }));
-      setLoading(false);
+    } catch (err) {
+      handleError(err);
     }
   };
 
   return (
     <div className="app">
       <Sidebar
-        chats={chats}
-        activeChatId={activeChatId}
         onNewChat={handleNewChat}
-        onSelectChat={handleSelectChat}
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed((prev) => !prev)}
       />

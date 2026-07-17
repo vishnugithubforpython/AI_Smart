@@ -31,16 +31,16 @@
 }
 
 .messages-container {
-  max-width: 768px;
+  max-width: var(--chat-max-width);
   margin: 0 auto;
-  padding: 24px 24px 8px;
+  padding: 24px 32px 8px;
   width: 100%;
 }
 
 .welcome-screen {
-  max-width: 768px;
+  max-width: var(--chat-max-width);
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 48px 32px;
   width: 100%;
 }
 
@@ -95,7 +95,7 @@
 }
 
 .input-area-inner {
-  max-width: 768px;
+  max-width: var(--chat-max-width);
   margin: 0 auto;
 }
 

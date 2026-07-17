@@ -16,7 +16,8 @@
   --user-msg-bg: #f4f4f4;
   --code-bg: #f4f4f4;
   --input-border: #d9d9e3;
-  --sidebar-width: 260px;
+  --sidebar-width: 220px;
+  --chat-max-width: 960px;
   --header-height: 52px;
   --input-area-height: 120px;
 

@@ -27,29 +27,10 @@
   background: var(--hover-bg);
 }
 
-.navbar__breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+.navbar__title {
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
-}
-
-.navbar__breadcrumb:hover {
-  background: var(--hover-bg);
-}
-
-.navbar__icon-btn {
-  padding: 8px;
-  border-radius: 8px;
-  color: var(--text-secondary);
-}
-
-.navbar__icon-btn:hover {
-  background: var(--hover-bg);
 }
 
 .navbar__profile {

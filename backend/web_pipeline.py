@@ -4,6 +4,8 @@ from web.extractor import extract_text
 from web.reranker import rerank_web
 from web.context_builder import build_context
 from web_answer import web_answer
+from web.search_rewriter import rewrite_search_query
+
 
 
 def web_pipeline(query):
@@ -12,6 +14,14 @@ def web_pipeline(query):
     # Step 1: Search Google
     # -----------------------------
     search_results = search_web(query)
+
+    optimized_query = rewrite_search_query(query)
+    print("\n========== SEARCH QUERY ==========")
+    print("Original :", query)
+    print("Optimized:", optimized_query)
+    print("=================================\n")
+
+
 
     if not search_results:
         return "I could not find relevant web results."
